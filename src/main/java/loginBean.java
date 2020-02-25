@@ -4,10 +4,13 @@
  * and open the template in the editor.
  */
 
+import java.io.IOException;
 import java.io.Serializable;
 import javax.inject.Named;
 import javax.enterprise.context.Dependent;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -15,19 +18,40 @@ import javax.faces.bean.RequestScoped;
  */
 @Named(value = "loginBean")
 @RequestScoped
-public class loginBean implements Serializable{
+public class loginBean implements Serializable {
+
     private String username;
     private String password;
+
     /**
      * Creates a new instance of loginBean
      */
     public loginBean() {
+
     }
-    public void login(){
-        
+
+    public void login() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (this.username.equals("admin") && this.password.equals("admin")) {
+            context.getExternalContext().getSessionMap().put("user", username);
+            try {
+                context.getExternalContext().redirect("home.xhtml");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            context.addMessage(null, new FacesMessage("La autenticación."));
+        }
     }
-    public void logout(){
-        
+
+    public void logout() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.getExternalContext().invalidateSession();
+        try {
+            context.getExternalContext().redirect("index.xhtml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getUsername() {
@@ -45,5 +69,5 @@ public class loginBean implements Serializable{
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
 }
